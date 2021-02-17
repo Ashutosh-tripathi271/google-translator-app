@@ -45,5 +45,6 @@ payload]]></ee:set-payload>
 		<logger level="INFO" doc:name="Logger" doc:id="a4bfa548-f0ab-45a4-8dc2-066116465c9e" message="#[typeOf(payload)]"/>
 		<set-payload value="#[payload.data.translations.translatedText[0]]" doc:name="Set Payload" doc:id="4ba44c58-d924-4811-bfa2-6a55a66be865" />
 		<logger level="INFO" doc:name="Logger" doc:id="071d968a-6c45-46c8-bb82-fd9955415cc4" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7c0b10c2-3858-4097-be05-ada9da63c598" message='"logger added at the end for testing"'/>
 	</flow>
 </mule>
