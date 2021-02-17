@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="7ba9d52f-fbc8-4a34-9a5b-4775f5f8ad55" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="a1e930f5-333c-4265-9361-632345686b68" >
+		<http:request-connection protocol="HTTPS" />
+	</http:request-config>
+	<flow name="google-translatorFlow" doc:id="0b994e07-8346-4586-a42d-eac6fec1858d" >
+		<http:listener doc:name="Listener" doc:id="6cb2894e-33b4-4d0d-aa66-19667ca6ca68" config-ref="HTTP_Listener_config" path="/google" allowedMethods="POST"/>
+		<logger level="INFO" doc:name="Logger" doc:id="17e5aa03-2edb-4f86-bb08-2348cef84b06" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="374800f0-ddd0-4edb-9706-8c39ef6b247c" message="#[payload.text]"/>
+		<set-variable value="#[payload.text as String]" doc:name="data" doc:id="e72a4cf4-02c6-4f9a-9628-e60be372da57" variableName="data"/>
+		<logger level="INFO" doc:name="Logger" doc:id="feada7a8-e1e6-419c-8578-f4efdb2efab5" message="#[typeOf(vars.data)]"/>
+		<set-payload value='#["q=" ++ vars.data ++ "&amp;source=en&amp;target=hin"]' doc:name="Set Payload" doc:id="d041f55f-d61d-47c2-a978-e67edaa03cea" />
+		<logger level="INFO" doc:name="Logger" doc:id="ac467085-066e-4260-99b1-acff75653a78" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d138cae7-2f91-4d68-b4ed-806c78b16ae6" message="#[typeOf(payload)]"/>
+		<ee:transform doc:name="Transform Message" doc:id="d3f4e9d2-5ec4-4caa-b0c3-b644f7878f83" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="fb11726e-5ae9-4439-93a0-29751e542b27" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="88c58534-128c-493e-8f24-c88eb9b18c7b" message="#[typeOf(payload)]"/>
+		<http:request method="POST" doc:name="Request" doc:id="4d8f2c66-fba6-4809-9651-c5bf765d974b" url="https://google-translate1.p.rapidapi.com/language/translate/v2">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"accept-encoding" : "application/gzip",
+	"x-rapidapi-key" : "a6931e1404mshb9cdce370c61f30p1b35c2jsn2d44fbf096d4",
+	"x-rapidapi-host" : "google-translate1.p.rapidapi.com",
+	"useQueryString" : true,
+	"content-type" : "application/x-www-form-urlencoded"
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="08218426-028b-479c-824b-8d7c95116fe9" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="a4bfa548-f0ab-45a4-8dc2-066116465c9e" message="#[typeOf(payload)]"/>
+		<set-payload value="#[payload.data.translations.translatedText[0]]" doc:name="Set Payload" doc:id="4ba44c58-d924-4811-bfa2-6a55a66be865" />
+		<logger level="INFO" doc:name="Logger" doc:id="071d968a-6c45-46c8-bb82-fd9955415cc4" message="#[payload]"/>
+	</flow>
+</mule>
